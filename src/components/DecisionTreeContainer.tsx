@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import NeuralDecisionBackground from './NeuralDecisionBackground'
 import { AboutContent, EducationContent, DataScienceContent, ProjectCard } from './DecisionNode'
@@ -29,9 +29,15 @@ export default function DecisionTreeContainer({
     })
 
     const [activeNode, setActiveNode] = useState<any>(null)
+    const [rootNodePosition, setRootNodePosition] = useState<{ x: number; y: number } | null>(null)
 
     // Handle clicks on canvas nodes
     const handleNodeClick = useCallback((node: any) => {
+        // Track root node position for text overlay
+        if (node.type === 'root') {
+            setRootNodePosition({ x: node.x, y: node.y })
+        }
+
         setTreeState(prev => ({
             ...prev,
             activeNodeId: node.id,
@@ -42,6 +48,19 @@ export default function DecisionTreeContainer({
             }
         }))
         setActiveNode(node)
+    }, [])
+
+    // Get root node position on component mount
+    useEffect(() => {
+        // Calculate where the root node appears in the VIEWPORT, not canvas coordinates
+        const viewportWidth = window.innerWidth
+        const viewportHeight = window.innerHeight
+
+        // Root node appears at center horizontally, and 1/6 down the viewport
+        const rootX = viewportWidth / 2
+        const rootY = viewportHeight / 6  // This is viewport position, not canvas position
+
+        setRootNodePosition({ x: rootX, y: rootY })
     }, [])
 
     return (
