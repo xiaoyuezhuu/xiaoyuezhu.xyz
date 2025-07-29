@@ -1,0 +1,119 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Decision-focused global styles */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+    /* Decision-focused color variables */
+    --deep-slate: #1a1a2e;
+    --electric-blue: #16213e;
+    --decision-green: #00f5ff;
+    --choice-orange: #ff6b35;
+    --neural-purple: #6c5ce7;
+    --warm-gray: #a8a8a8;
+
+    /* Background gradients */
+    --decision-gradient: linear-gradient(135deg, var(--deep-slate) 0%, var(--electric-blue) 100%);
+}
+
+* {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+}
+
+html,
+body {
+    max-width: 100vw;
+    overflow-x: hidden;
+}
+
+body {
+    color: white;
+    background: var(--decision-gradient);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    line-height: 1.6;
+    scroll-behavior: smooth;
+}
+
+/* Decision tree animation utilities */
+.decision-branch {
+    position: relative;
+    overflow: hidden;
+}
+
+.decision-branch::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--decision-green);
+    transform: translateY(-50%) scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease-out;
+}
+
+.decision-branch:hover::before {
+    transform: translateY(-50%) scaleX(1);
+}
+
+/* Choice highlight effect */
+.choice-highlight {
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.choice-highlight:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 245, 255, 0.2);
+}
+
+/* Optimal path glow */
+.optimal-path {
+    box-shadow: 0 0 20px rgba(0, 245, 255, 0.3);
+    border: 1px solid rgba(0, 245, 255, 0.2);
+}
+
+/* Responsive text scaling */
+@media (max-width: 768px) {
+    body {
+        font-size: 16px;
+    }
+}
+
+/* Focus indicators for accessibility */
+button:focus-visible,
+a:focus-visible {
+    outline: 2px solid var(--decision-green);
+    outline-offset: 2px;
+}
+
+/* Smooth transitions for all interactive elements */
+button,
+a,
+.interactive {
+    transition: all 0.2s ease-in-out;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--electric-blue);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--decision-green);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--choice-orange);
+}
