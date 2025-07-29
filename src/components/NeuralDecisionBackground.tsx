@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useEffect, useCallback } from 'react'
+import { useRef, useEffect, useCallback, useState } from 'react'
 
 interface NeuralNode {
     id: number
@@ -12,6 +12,9 @@ interface NeuralNode {
     targetIntensity: number
     pulsePhase: number
     size: number
+    type: 'root' | 'education' | 'datascience' | 'project'
+    title: string
+    description?: string
 }
 
 interface Connection {
@@ -23,15 +26,18 @@ interface Connection {
 }
 
 export default function NeuralDecisionBackground({
-    mousePosition
+    mousePosition,
+    onNodeClick
 }: {
     mousePosition: { x: number; y: number }
+    onNodeClick?: (node: NeuralNode) => void
 }) {
     const canvasRef = useRef<HTMLCanvasElement>(null)
     const animationFrameRef = useRef<number>()
     const nodesRef = useRef<NeuralNode[]>([])
     const connectionsRef = useRef<Connection[]>([])
     const startTimeRef = useRef<number>(Date.now())
+    const [hoveredNodeId, setHoveredNodeId] = useState<number | null>(null)
 
     // Generate neural network structure
     const generateNeuralNetwork = useCallback((width: number, height: number) => {
@@ -45,19 +51,32 @@ export default function NeuralDecisionBackground({
         const levelHeight = height / (levels + 1)
 
         layerStructure.forEach((nodesInLevel, level) => {
-            const yPos = levelHeight * (level + 1)
+            // Spread nodes out more across the longer canvas
+            const yPos = (height / 6) + (level * height / 4) // Start lower, more spacing
 
             // Create nodes for this level
             for (let i = 0; i < nodesInLevel; i++) {
                 let xPos: number
+                let nodeType: NeuralNode['type']
+                let title: string
 
                 if (nodesInLevel === 1) {
                     // Single node centered
                     xPos = width / 2
-                } else {
+                    nodeType = 'root'
+                    title = 'The Decision Architect'
+                } else if (nodesInLevel === 2) {
                     // Multiple nodes spread evenly
                     const xSpread = Math.min(width * 0.7, 400)
                     xPos = width / 2 + (i - (nodesInLevel - 1) / 2) * (xSpread / Math.max(1, nodesInLevel - 1))
+                    nodeType = i === 0 ? 'education' : 'datascience'
+                    title = i === 0 ? 'PhD in Decision Science' : 'AI Decision Systems'
+                } else {
+                    // Project nodes
+                    const xSpread = Math.min(width * 0.7, 400)
+                    xPos = width / 2 + (i - (nodesInLevel - 1) / 2) * (xSpread / Math.max(1, nodesInLevel - 1))
+                    nodeType = 'project'
+                    title = `Research Project ${i + 1}`
                 }
 
                 nodes.push({
@@ -69,7 +88,9 @@ export default function NeuralDecisionBackground({
                     intensity: 0.4 + Math.random() * 0.3,
                     targetIntensity: 0.5,
                     pulsePhase: Math.random() * Math.PI * 2,
-                    size: 4 + Math.random() * 3
+                    size: 4 + Math.random() * 3,
+                    type: nodeType,
+                    title: title
                 })
             }
         })
@@ -201,53 +222,69 @@ export default function NeuralDecisionBackground({
             }
         })
 
-        // Render nodes (decision points) with more subtle effects
+        // Render nodes (decision points) with hover effects
         nodes.forEach(node => {
-            const finalSize = node.size * (0.9 + node.intensity * 0.2) // Less size variation
+            const isHovered = hoveredNodeId === node.id
+            const hoverScale = isHovered ? 2.5 : 1
+            const finalSize = node.size * (0.9 + node.intensity * 0.2) * hoverScale
 
-            // More subtle node glow effect
-            const gradient = ctx.createRadialGradient(node.x, node.y, 0, node.x, node.y, finalSize * 2.5)
-            const hue = 180 + node.level * 10 + node.intensity * 25 // Less dramatic color shifts
-            gradient.addColorStop(0, `hsla(${hue}, 70%, 60%, ${node.intensity * 0.4})`)
-            gradient.addColorStop(0.5, `hsla(${hue}, 60%, 50%, ${node.intensity * 0.2})`)
+            // Enhanced node glow effect when hovered
+            const glowMultiplier = isHovered ? 3 : 2.5
+            const gradient = ctx.createRadialGradient(node.x, node.y, 0, node.x, node.y, finalSize * glowMultiplier)
+            const hue = 180 + node.level * 10 + node.intensity * 25
+            const glowOpacity = isHovered ? node.intensity * 0.8 : node.intensity * 0.4
+
+            gradient.addColorStop(0, `hsla(${hue}, 70%, 60%, ${glowOpacity})`)
+            gradient.addColorStop(0.5, `hsla(${hue}, 60%, 50%, ${glowOpacity * 0.5})`)
             gradient.addColorStop(1, `hsla(${hue}, 50%, 40%, 0)`)
 
             ctx.beginPath()
-            ctx.arc(node.x, node.y, finalSize * 2.5, 0, Math.PI * 2)
+            ctx.arc(node.x, node.y, finalSize * glowMultiplier, 0, Math.PI * 2)
             ctx.fillStyle = gradient
             ctx.fill()
 
-            // Main node with more subtle intensity
+            // Main node with enhanced visibility when hovered
+            const nodeOpacity = isHovered ? 0.9 + node.intensity * 0.1 : 0.7 + node.intensity * 0.15
             ctx.beginPath()
             ctx.arc(node.x, node.y, finalSize, 0, Math.PI * 2)
-            ctx.fillStyle = `hsla(${hue}, 60%, 60%, ${0.7 + node.intensity * 0.15})`
+            ctx.fillStyle = `hsla(${hue}, 60%, 60%, ${nodeOpacity})`
             ctx.fill()
 
-            // Smaller, more subtle inner core
+            // Enhanced inner core when hovered
+            const coreSize = finalSize * (isHovered ? 0.4 : 0.3)
+            const coreOpacity = isHovered ? node.intensity * 0.9 : node.intensity * 0.6
             ctx.beginPath()
-            ctx.arc(node.x, node.y, finalSize * 0.3, 0, Math.PI * 2)
-            ctx.fillStyle = `hsla(${hue}, 80%, 75%, ${node.intensity * 0.6})`
+            ctx.arc(node.x, node.y, coreSize, 0, Math.PI * 2)
+            ctx.fillStyle = `hsla(${hue}, 80%, 75%, ${coreOpacity})`
             ctx.fill()
+
+            // Add pulsing ring for hovered nodes
+            if (isHovered) {
+                const pulseSize = finalSize * (1.2 + Math.sin(currentTime * 3) * 0.2)
+                ctx.beginPath()
+                ctx.arc(node.x, node.y, pulseSize, 0, Math.PI * 2)
+                ctx.strokeStyle = `hsla(${hue}, 80%, 70%, 0.5)`
+                ctx.lineWidth = 2
+                ctx.stroke()
+            }
         })
 
         animationFrameRef.current = requestAnimationFrame(animate)
-    }, [mousePosition])
+    }, [mousePosition, hoveredNodeId])
 
     // Handle canvas setup and resize
     const setupCanvas = useCallback(() => {
         const canvas = canvasRef.current
         if (!canvas) return
 
-        // Get the parent container dimensions instead of just the canvas rect
-        const container = canvas.parentElement
-        if (!container) return
-
-        const rect = container.getBoundingClientRect()
+        // Use viewport width but make height much longer for scrolling
+        const width = window.innerWidth
+        const height = window.innerHeight * 2
         const dpr = window.devicePixelRatio || 1
 
-        // Set canvas size to fill the container
-        canvas.width = rect.width * dpr
-        canvas.height = rect.height * dpr
+        // Set canvas size 
+        canvas.width = width * dpr
+        canvas.height = height * dpr
 
         const ctx = canvas.getContext('2d')
         if (ctx) {
@@ -255,12 +292,72 @@ export default function NeuralDecisionBackground({
             ctx.imageSmoothingEnabled = true
         }
 
-        // Set CSS size to match container
-        canvas.style.width = rect.width + 'px'
-        canvas.style.height = rect.height + 'px'
+        // Set CSS size - height much longer than viewport
+        canvas.style.width = width + 'px'
+        canvas.style.height = height + 'px'
 
-        generateNeuralNetwork(rect.width, rect.height)
+        generateNeuralNetwork(width, height)
     }, [generateNeuralNetwork])
+
+    // Handle canvas mouse move for hover effects
+    const handleCanvasMouseMove = useCallback((event: MouseEvent) => {
+        const canvas = canvasRef.current
+        if (!canvas) return
+
+        const rect = canvas.getBoundingClientRect()
+        const scaleX = canvas.width / rect.width
+        const scaleY = canvas.height / rect.height
+
+        const mouseX = (event.clientX - rect.left) * scaleX
+        const mouseY = (event.clientY - rect.top) * scaleY
+
+        // Check if mouse is hovering over any node
+        const nodes = nodesRef.current
+        let foundHoveredNode = null
+
+        for (const node of nodes) {
+            const distance = Math.sqrt(
+                Math.pow(mouseX - node.x, 2) +
+                Math.pow(mouseY - node.y, 2)
+            )
+
+            // Hover detection radius (larger than click radius)
+            if (distance <= (node.size * 4 + 30)) {
+                foundHoveredNode = node.id
+                break
+            }
+        }
+
+        setHoveredNodeId(foundHoveredNode)
+    }, [])
+
+    // Handle canvas clicks
+    const handleCanvasClick = useCallback((event: MouseEvent) => {
+        const canvas = canvasRef.current
+        if (!canvas || !onNodeClick) return
+
+        const rect = canvas.getBoundingClientRect()
+        const scaleX = canvas.width / rect.width
+        const scaleY = canvas.height / rect.height
+
+        const clickX = (event.clientX - rect.left) * scaleX
+        const clickY = (event.clientY - rect.top) * scaleY
+
+        // Check if click is near any node
+        const nodes = nodesRef.current
+        for (const node of nodes) {
+            const distance = Math.sqrt(
+                Math.pow(clickX - node.x, 2) +
+                Math.pow(clickY - node.y, 2)
+            )
+
+            // Click within node radius (larger for easier clicking)
+            if (distance <= (node.size * 3 + 20)) {
+                onNodeClick(node)
+                break
+            }
+        }
+    }, [onNodeClick])
 
     useEffect(() => {
         setupCanvas()
@@ -270,6 +367,7 @@ export default function NeuralDecisionBackground({
             setupCanvas()
         }
 
+        // Only listen to window resize, not scroll
         window.addEventListener('resize', handleResize)
 
         return () => {
@@ -280,16 +378,27 @@ export default function NeuralDecisionBackground({
         }
     }, [setupCanvas, animate])
 
+    useEffect(() => {
+        const canvas = canvasRef.current
+        if (canvas) {
+            canvas.addEventListener('click', handleCanvasClick)
+            canvas.addEventListener('mousemove', handleCanvasMouseMove)
+            return () => {
+                canvas.removeEventListener('click', handleCanvasClick)
+                canvas.removeEventListener('mousemove', handleCanvasMouseMove)
+            }
+        }
+    }, [handleCanvasClick, handleCanvasMouseMove])
+
     return (
-        <div className="absolute inset-0 w-full h-full overflow-hidden z-0">
+        <div className="absolute inset-0 w-full h-full overflow-hidden z-10">
             <canvas
                 ref={canvasRef}
-                className="absolute inset-0 w-full h-full object-cover"
+                className="absolute inset-0 w-full h-full object-cover cursor-pointer"
                 style={{
                     mixBlendMode: 'screen',
                     width: '100%',
-                    height: '100%',
-                    pointerEvents: 'none'
+                    height: '100%'
                 }}
             />
         </div>

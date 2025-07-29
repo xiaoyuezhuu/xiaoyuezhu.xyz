@@ -225,18 +225,17 @@ export default function DecisionNode({
 }
 
 // Content Components
-function AboutContent() {
+export function AboutContent() {
     return (
         <motion.div
             className="bg-deep-slate/95 backdrop-blur-md border border-decision-green/20 rounded-xl p-6 text-white"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
         >
             <h2 className="text-2xl font-bold text-decision-green mb-4">The Decision Architect</h2>
-            <p className="text-lg leading-relaxed mb-4">
-                I bridge the <span className="text-choice-orange font-semibold">$3 trillion gap</span> between
-                how humans make decisions and how AI can make them better.
+            <p className="text-warm-gray mb-3">
+                I bridge the $3 trillion gap between how humans make decisions and how AI can make them better.
             </p>
             <p className="text-warm-gray">
                 The only researcher building the future of human-AI decision collaboration,
@@ -246,7 +245,7 @@ function AboutContent() {
     )
 }
 
-function EducationContent() {
+export function EducationContent() {
     return (
         <motion.div
             className="bg-neural-purple/10 backdrop-blur-md border border-neural-purple/30 rounded-xl p-5 text-white"
@@ -273,7 +272,7 @@ function EducationContent() {
     )
 }
 
-function DataScienceContent() {
+export function DataScienceContent() {
     return (
         <motion.div
             className="bg-choice-orange/10 backdrop-blur-md border border-choice-orange/30 rounded-xl p-5 text-white"
@@ -300,7 +299,7 @@ function DataScienceContent() {
     )
 }
 
-function ProjectCard({
+export function ProjectCard({
     data,
     isExpanded,
     onToggle
