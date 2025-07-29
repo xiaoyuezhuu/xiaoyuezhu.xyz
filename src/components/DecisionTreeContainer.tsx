@@ -33,21 +33,34 @@ export default function DecisionTreeContainer({
 
     // Handle clicks on canvas nodes
     const handleNodeClick = useCallback((node: any) => {
-        // Track root node position for text overlay
         if (node.type === 'root') {
-            setRootNodePosition({ x: node.x, y: node.y })
+            // Dispatch custom event for root node click
+            window.dispatchEvent(new CustomEvent('rootNodeClicked', {
+                detail: { nodeType: 'root', node }
+            }))
+        } else if (node.level === 1 && node.id === 1) {
+            // First node on second layer (education)
+            window.dispatchEvent(new CustomEvent('educationNodeClicked', {
+                detail: { nodeType: 'education', node }
+            }))
+        } else if (node.level === 1 && node.id === 2) {
+            // Second node on second layer (data science)
+            window.dispatchEvent(new CustomEvent('dataScienceNodeClicked', {
+                detail: { nodeType: 'data-science', node }
+            }))
+        } else {
+            // For other nodes, show the modal as before
+            setTreeState(prev => ({
+                ...prev,
+                activeNodeId: node.id,
+                visitedNodes: new Set(Array.from(prev.visitedNodes).concat(node.id)),
+                showContent: {
+                    ...prev.showContent,
+                    [node.id]: !prev.showContent[node.id]
+                }
+            }))
+            setActiveNode(node)
         }
-
-        setTreeState(prev => ({
-            ...prev,
-            activeNodeId: node.id,
-            visitedNodes: new Set(Array.from(prev.visitedNodes).concat(node.id)),
-            showContent: {
-                ...prev.showContent,
-                [node.id]: !prev.showContent[node.id]
-            }
-        }))
-        setActiveNode(node)
     }, [])
 
     // Get root node position on component mount
