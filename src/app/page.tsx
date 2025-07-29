@@ -271,6 +271,450 @@ function DataScienceOverlay() {
     )
 }
 
+function ProjectOverlay() {
+    const [position, setPosition] = useState({ top: 200, left: 500 })
+    const [isVisible, setIsVisible] = useState(false)
+    const [isExpanded, setIsExpanded] = useState(false)
+
+    useEffect(() => {
+        const updatePosition = () => {
+            // Calculate where the project node appears in the canvas
+            const canvasHeight = window.innerHeight * 4 // Canvas is 4x viewport height
+            const projectNodeY = (canvasHeight / 6) * 2.4 // Project node at 3/6 down the canvas (third layer)
+
+            // Convert to viewport position based on scroll
+            const scrollY = window.scrollY
+            const viewportProjectY = projectNodeY - scrollY
+
+            // Show text when project node is in viewport (with some margin)
+            const isProjectVisible = viewportProjectY > -100 && viewportProjectY < window.innerHeight + 100
+            setIsVisible(isProjectVisible)
+
+            if (isProjectVisible) {
+                setPosition({
+                    top: Math.max(30, Math.min(window.innerHeight - 100, viewportProjectY)),
+                    left: window.innerWidth / 4 + 50
+                })
+            }
+        }
+
+        // Listen for project node clicks
+        const handleProjectClick = (event: Event) => {
+            const customEvent = event as CustomEvent
+            if (customEvent.detail?.nodeType === 'project') {
+                setIsExpanded(true)
+            }
+        }
+
+        updatePosition()
+        window.addEventListener('scroll', updatePosition)
+        window.addEventListener('resize', updatePosition)
+        window.addEventListener('projectNodeClicked', handleProjectClick)
+
+        return () => {
+            window.removeEventListener('scroll', updatePosition)
+            window.removeEventListener('resize', updatePosition)
+            window.removeEventListener('projectNodeClicked', handleProjectClick)
+        }
+    }, [])
+
+    if (!isVisible) return null
+
+    return (
+        <div
+            style={{
+                position: 'fixed',
+                top: `${position.top}px`,
+                left: `${position.left}px`,
+                zIndex: 50,
+                pointerEvents: isExpanded ? 'auto' : 'none',
+                transition: 'all 0.3s ease-in-out'
+            }}
+        >
+            {!isExpanded ? (
+                // Collapsed state - just the title
+                <div style={{
+                    color: '#00f5ff',
+                    fontSize: '28px',
+                    fontWeight: 'bold',
+                    textShadow: '2px 2px 4px rgba(0,0,0,0.8)',
+                    whiteSpace: 'nowrap'
+                }}>
+                    Project X
+                    <div style={{
+                        fontSize: '14px',
+                        color: '#a8a8a8',
+                        marginTop: '4px',
+                        opacity: 0.8
+                    }}>
+                        Click node to explore
+                    </div>
+                </div>
+            ) : (
+                // Expanded state - full card
+                <div style={{
+                    backgroundColor: 'rgba(26, 26, 46, 0.1)',
+                    backdropFilter: 'blur(12px)',
+                    border: '1px solid rgba(0, 245, 255, 0.2)',
+                    borderRadius: '12px',
+                    padding: '24px',
+                    maxWidth: '400px',
+                    boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)'
+                }}>
+                    <h2 style={{
+                        color: '#00f5ff',
+                        fontSize: '28px',
+                        fontWeight: 'bold',
+                        marginBottom: '16px'
+                    }}>
+                        Neural Decision Platform
+                    </h2>
+                    <p style={{
+                        color: 'white',
+                        fontSize: '16px',
+                        lineHeight: '1.6',
+                        marginBottom: '12px'
+                    }}>
+                        Revolutionary AI platform that bridges human intuition with machine learning for complex decision scenarios.
+                    </p>
+                    <p style={{
+                        color: 'white',
+                        fontSize: '14px',
+                        lineHeight: '1.5'
+                    }}>
+                        Deployed across Fortune 500 companies, improving decision accuracy by 40% while reducing cognitive load on human operators.
+                    </p>
+                    <button
+                        onClick={() => setIsExpanded(false)}
+                        style={{
+                            marginTop: '16px',
+                            padding: '8px 16px',
+                            backgroundColor: 'rgba(0, 245, 255, 0.1)',
+                            border: '1px solid rgba(0, 245, 255, 0.3)',
+                            borderRadius: '8px',
+                            color: '#00f5ff',
+                            fontSize: '12px',
+                            cursor: 'pointer'
+                        }}
+                    >
+                        Close
+                    </button>
+                </div>
+            )}
+        </div>
+    )
+}
+
+function ProjectYOverlay() {
+    const [position, setPosition] = useState({ top: 200, left: 500 })
+    const [isVisible, setIsVisible] = useState(false)
+    const [isExpanded, setIsExpanded] = useState(false)
+
+    useEffect(() => {
+        const updatePosition = () => {
+            const canvasHeight = window.innerHeight * 4
+            const projectNodeY = (canvasHeight / 6) * 2.4
+            const scrollY = window.scrollY
+            const viewportProjectY = projectNodeY - scrollY
+            const isProjectVisible = viewportProjectY > -100 && viewportProjectY < window.innerHeight + 100
+            setIsVisible(isProjectVisible)
+
+            if (isProjectVisible) {
+                setPosition({
+                    top: Math.max(30, Math.min(window.innerHeight - 100, viewportProjectY)),
+                    left: window.innerWidth / 4 + 250
+                })
+            }
+        }
+
+        const handleProjectClick = (event: Event) => {
+            const customEvent = event as CustomEvent
+            if (customEvent.detail?.nodeType === 'projectY') {
+                setIsExpanded(true)
+            }
+        }
+
+        updatePosition()
+        window.addEventListener('scroll', updatePosition)
+        window.addEventListener('resize', updatePosition)
+        window.addEventListener('projectYNodeClicked', handleProjectClick)
+
+        return () => {
+            window.removeEventListener('scroll', updatePosition)
+            window.removeEventListener('resize', updatePosition)
+            window.removeEventListener('projectYNodeClicked', handleProjectClick)
+        }
+    }, [])
+
+    if (!isVisible) return null
+
+    return (
+        <div style={{ position: 'fixed', top: `${position.top}px`, left: `${position.left}px`, zIndex: 50, pointerEvents: isExpanded ? 'auto' : 'none', transition: 'all 0.3s ease-in-out' }}>
+            {!isExpanded ? (
+                <div style={{ color: '#00f5ff', fontSize: '28px', fontWeight: 'bold', textShadow: '2px 2px 4px rgba(0,0,0,0.8)', whiteSpace: 'nowrap' }}>
+                    Project Y
+                    <div style={{ fontSize: '14px', color: '#a8a8a8', marginTop: '4px', opacity: 0.8 }}>Click node to explore</div>
+                </div>
+            ) : (
+                <div style={{ backgroundColor: 'rgba(26, 26, 46, 0.1)', backdropFilter: 'blur(12px)', border: '1px solid rgba(0, 245, 255, 0.2)', borderRadius: '12px', padding: '24px', maxWidth: '400px', boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)' }}>
+                    <h2 style={{ color: '#00f5ff', fontSize: '28px', fontWeight: 'bold', marginBottom: '16px' }}>AI Ethics Framework</h2>
+                    <p style={{ color: 'white', fontSize: '16px', lineHeight: '1.6', marginBottom: '12px' }}>Comprehensive framework for ethical AI decision-making in healthcare and finance sectors.</p>
+                    <p style={{ color: 'white', fontSize: '14px', lineHeight: '1.5' }}>Adopted by 50+ institutions, ensuring responsible AI deployment while maintaining decision accuracy.</p>
+                    <button onClick={() => setIsExpanded(false)} style={{ marginTop: '16px', padding: '8px 16px', backgroundColor: 'rgba(0, 245, 255, 0.1)', border: '1px solid rgba(0, 245, 255, 0.3)', borderRadius: '8px', color: '#00f5ff', fontSize: '12px', cursor: 'pointer' }}>Close</button>
+                </div>
+            )}
+        </div>
+    )
+}
+
+function ProjectZOverlay() {
+    const [position, setPosition] = useState({ top: 200, left: 500 })
+    const [isVisible, setIsVisible] = useState(false)
+    const [isExpanded, setIsExpanded] = useState(false)
+
+    useEffect(() => {
+        const updatePosition = () => {
+            const canvasHeight = window.innerHeight * 4
+            const projectNodeY = (canvasHeight / 6) * 2.4
+            const scrollY = window.scrollY
+            const viewportProjectY = projectNodeY - scrollY
+            const isProjectVisible = viewportProjectY > -100 && viewportProjectY < window.innerHeight + 100
+            setIsVisible(isProjectVisible)
+
+            if (isProjectVisible) {
+                setPosition({
+                    top: Math.max(30, Math.min(window.innerHeight - 100, viewportProjectY)),
+                    left: window.innerWidth / 4 + 500
+                })
+            }
+        }
+
+        const handleProjectClick = (event: Event) => {
+            const customEvent = event as CustomEvent
+            if (customEvent.detail?.nodeType === 'projectZ') {
+                setIsExpanded(true)
+            }
+        }
+
+        updatePosition()
+        window.addEventListener('scroll', updatePosition)
+        window.addEventListener('resize', updatePosition)
+        window.addEventListener('projectZNodeClicked', handleProjectClick)
+
+        return () => {
+            window.removeEventListener('scroll', updatePosition)
+            window.removeEventListener('resize', updatePosition)
+            window.removeEventListener('projectZNodeClicked', handleProjectClick)
+        }
+    }, [])
+
+    if (!isVisible) return null
+
+    return (
+        <div style={{ position: 'fixed', top: `${position.top}px`, left: `${position.left}px`, zIndex: 50, pointerEvents: isExpanded ? 'auto' : 'none', transition: 'all 0.3s ease-in-out' }}>
+            {!isExpanded ? (
+                <div style={{ color: '#00f5ff', fontSize: '28px', fontWeight: 'bold', textShadow: '2px 2px 4px rgba(0,0,0,0.8)', whiteSpace: 'nowrap' }}>
+                    Project Z
+                    <div style={{ fontSize: '14px', color: '#a8a8a8', marginTop: '4px', opacity: 0.8 }}>Click node to explore</div>
+                </div>
+            ) : (
+                <div style={{ backgroundColor: 'rgba(26, 26, 46, 0.1)', backdropFilter: 'blur(12px)', border: '1px solid rgba(0, 245, 255, 0.2)', borderRadius: '12px', padding: '24px', maxWidth: '400px', boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)' }}>
+                    <h2 style={{ color: '#00f5ff', fontSize: '28px', fontWeight: 'bold', marginBottom: '16px' }}>Quantum Decision Optimizer</h2>
+                    <p style={{ color: 'white', fontSize: '16px', lineHeight: '1.6', marginBottom: '12px' }}>Next-generation quantum computing approach to solve complex multi-variable decision problems.</p>
+                    <p style={{ color: 'white', fontSize: '14px', lineHeight: '1.5' }}>Processing 1000x faster than classical algorithms, enabling real-time optimization for global supply chains.</p>
+                    <button onClick={() => setIsExpanded(false)} style={{ marginTop: '16px', padding: '8px 16px', backgroundColor: 'rgba(0, 245, 255, 0.1)', border: '1px solid rgba(0, 245, 255, 0.3)', borderRadius: '8px', color: '#00f5ff', fontSize: '12px', cursor: 'pointer' }}>Close</button>
+                </div>
+            )}
+        </div>
+    )
+}
+
+function ProjectAOverlay() {
+    const [position, setPosition] = useState({ top: 200, left: 500 })
+    const [isVisible, setIsVisible] = useState(false)
+    const [isExpanded, setIsExpanded] = useState(false)
+
+    useEffect(() => {
+        const updatePosition = () => {
+            const canvasHeight = window.innerHeight * 4
+            const projectNodeY = (canvasHeight / 6) * 2.4
+            const scrollY = window.scrollY
+            const viewportProjectY = projectNodeY - scrollY
+            const isProjectVisible = viewportProjectY > -100 && viewportProjectY < window.innerHeight + 100
+            setIsVisible(isProjectVisible)
+
+            if (isProjectVisible) {
+                setPosition({
+                    top: Math.max(30, Math.min(window.innerHeight - 100, viewportProjectY)),
+                    left: window.innerWidth / 2 + 25
+                })
+            }
+        }
+
+        const handleProjectClick = (event: Event) => {
+            const customEvent = event as CustomEvent
+            if (customEvent.detail?.nodeType === 'projectA') {
+                setIsExpanded(true)
+            }
+        }
+
+        updatePosition()
+        window.addEventListener('scroll', updatePosition)
+        window.addEventListener('resize', updatePosition)
+        window.addEventListener('projectANodeClicked', handleProjectClick)
+
+        return () => {
+            window.removeEventListener('scroll', updatePosition)
+            window.removeEventListener('resize', updatePosition)
+            window.removeEventListener('projectANodeClicked', handleProjectClick)
+        }
+    }, [])
+
+    if (!isVisible) return null
+
+    return (
+        <div style={{ position: 'fixed', top: `${position.top}px`, left: `${position.left}px`, zIndex: 50, pointerEvents: isExpanded ? 'auto' : 'none', transition: 'all 0.3s ease-in-out' }}>
+            {!isExpanded ? (
+                <div style={{ color: '#00f5ff', fontSize: '28px', fontWeight: 'bold', textShadow: '2px 2px 4px rgba(0,0,0,0.8)', whiteSpace: 'nowrap' }}>
+                    Project A
+                    <div style={{ fontSize: '14px', color: '#a8a8a8', marginTop: '4px', opacity: 0.8 }}>Click node to explore</div>
+                </div>
+            ) : (
+                <div style={{ backgroundColor: 'rgba(26, 26, 46, 0.1)', backdropFilter: 'blur(12px)', border: '1px solid rgba(0, 245, 255, 0.2)', borderRadius: '12px', padding: '24px', maxWidth: '400px', boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)' }}>
+                    <h2 style={{ color: '#00f5ff', fontSize: '28px', fontWeight: 'bold', marginBottom: '16px' }}>Behavioral Prediction Engine</h2>
+                    <p style={{ color: 'white', fontSize: '16px', lineHeight: '1.6', marginBottom: '12px' }}>Advanced behavioral modeling system predicting human decision patterns with 95% accuracy.</p>
+                    <p style={{ color: 'white', fontSize: '14px', lineHeight: '1.5' }}>Used by leading e-commerce platforms to personalize user experiences and optimize conversion rates.</p>
+                    <button onClick={() => setIsExpanded(false)} style={{ marginTop: '16px', padding: '8px 16px', backgroundColor: 'rgba(0, 245, 255, 0.1)', border: '1px solid rgba(0, 245, 255, 0.3)', borderRadius: '8px', color: '#00f5ff', fontSize: '12px', cursor: 'pointer' }}>Close</button>
+                </div>
+            )}
+        </div>
+    )
+}
+
+function ProjectBOverlay() {
+    const [position, setPosition] = useState({ top: 200, left: 500 })
+    const [isVisible, setIsVisible] = useState(false)
+    const [isExpanded, setIsExpanded] = useState(false)
+
+    useEffect(() => {
+        const updatePosition = () => {
+            const canvasHeight = window.innerHeight * 4
+            const projectNodeY = (canvasHeight / 6) * 2.4
+            const scrollY = window.scrollY
+            const viewportProjectY = projectNodeY - scrollY
+            const isProjectVisible = viewportProjectY > -100 && viewportProjectY < window.innerHeight + 100
+            setIsVisible(isProjectVisible)
+
+            if (isProjectVisible) {
+                setPosition({
+                    top: Math.max(30, Math.min(window.innerHeight - 100, viewportProjectY)),
+                    left: window.innerWidth / 1.5 - 165
+                })
+            }
+        }
+
+        const handleProjectClick = (event: Event) => {
+            const customEvent = event as CustomEvent
+            if (customEvent.detail?.nodeType === 'projectB') {
+                setIsExpanded(true)
+            }
+        }
+
+        updatePosition()
+        window.addEventListener('scroll', updatePosition)
+        window.addEventListener('resize', updatePosition)
+        window.addEventListener('projectBNodeClicked', handleProjectClick)
+
+        return () => {
+            window.removeEventListener('scroll', updatePosition)
+            window.removeEventListener('resize', updatePosition)
+            window.removeEventListener('projectBNodeClicked', handleProjectClick)
+        }
+    }, [])
+
+    if (!isVisible) return null
+
+    return (
+        <div style={{ position: 'fixed', top: `${position.top}px`, left: `${position.left}px`, zIndex: 50, pointerEvents: isExpanded ? 'auto' : 'none', transition: 'all 0.3s ease-in-out' }}>
+            {!isExpanded ? (
+                <div style={{ color: '#00f5ff', fontSize: '28px', fontWeight: 'bold', textShadow: '2px 2px 4px rgba(0,0,0,0.8)', whiteSpace: 'nowrap' }}>
+                    Project B
+                    <div style={{ fontSize: '14px', color: '#a8a8a8', marginTop: '4px', opacity: 0.8 }}>Click node to explore</div>
+                </div>
+            ) : (
+                <div style={{ backgroundColor: 'rgba(26, 26, 46, 0.1)', backdropFilter: 'blur(12px)', border: '1px solid rgba(0, 245, 255, 0.2)', borderRadius: '12px', padding: '24px', maxWidth: '400px', boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)' }}>
+                    <h2 style={{ color: '#00f5ff', fontSize: '28px', fontWeight: 'bold', marginBottom: '16px' }}>Autonomous Decision System</h2>
+                    <p style={{ color: 'white', fontSize: '16px', lineHeight: '1.6', marginBottom: '12px' }}>Self-learning autonomous system for critical infrastructure decision-making in smart cities.</p>
+                    <p style={{ color: 'white', fontSize: '14px', lineHeight: '1.5' }}>Managing traffic flow, energy distribution, and emergency response across 12 major metropolitan areas.</p>
+                    <button onClick={() => setIsExpanded(false)} style={{ marginTop: '16px', padding: '8px 16px', backgroundColor: 'rgba(0, 245, 255, 0.1)', border: '1px solid rgba(0, 245, 255, 0.3)', borderRadius: '8px', color: '#00f5ff', fontSize: '12px', cursor: 'pointer' }}>Close</button>
+                </div>
+            )}
+        </div>
+    )
+}
+
+function ProjectCOverlay() {
+    const [position, setPosition] = useState({ top: 200, left: 500 })
+    const [isVisible, setIsVisible] = useState(false)
+    const [isExpanded, setIsExpanded] = useState(false)
+
+    useEffect(() => {
+        const updatePosition = () => {
+            const canvasHeight = window.innerHeight * 4
+            const projectNodeY = (canvasHeight / 6) * 2.4
+            const scrollY = window.scrollY
+            const viewportProjectY = projectNodeY - scrollY
+            const isProjectVisible = viewportProjectY > -100 && viewportProjectY < window.innerHeight + 100
+            setIsVisible(isProjectVisible)
+
+            if (isProjectVisible) {
+                setPosition({
+                    top: Math.max(30, Math.min(window.innerHeight - 100, viewportProjectY)),
+                    left: window.innerWidth / 1.5
+                })
+            }
+        }
+
+        const handleProjectClick = (event: Event) => {
+            const customEvent = event as CustomEvent
+            if (customEvent.detail?.nodeType === 'projectC') {
+                setIsExpanded(true)
+            }
+        }
+
+        updatePosition()
+        window.addEventListener('scroll', updatePosition)
+        window.addEventListener('resize', updatePosition)
+        window.addEventListener('projectCNodeClicked', handleProjectClick)
+
+        return () => {
+            window.removeEventListener('scroll', updatePosition)
+            window.removeEventListener('resize', updatePosition)
+            window.removeEventListener('projectCNodeClicked', handleProjectClick)
+        }
+    }, [])
+
+    if (!isVisible) return null
+
+    return (
+        <div style={{ position: 'fixed', top: `${position.top}px`, left: `${position.left}px`, zIndex: 50, pointerEvents: isExpanded ? 'auto' : 'none', transition: 'all 0.3s ease-in-out' }}>
+            {!isExpanded ? (
+                <div style={{ color: '#00f5ff', fontSize: '28px', fontWeight: 'bold', textShadow: '2px 2px 4px rgba(0,0,0,0.8)', whiteSpace: 'nowrap' }}>
+                    Project C
+                    <div style={{ fontSize: '14px', color: '#a8a8a8', marginTop: '4px', opacity: 0.8 }}>Click node to explore</div>
+                </div>
+            ) : (
+                <div style={{ backgroundColor: 'rgba(26, 26, 46, 0.1)', backdropFilter: 'blur(12px)', border: '1px solid rgba(0, 245, 255, 0.2)', borderRadius: '12px', padding: '24px', maxWidth: '400px', boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)' }}>
+                    <h2 style={{ color: '#00f5ff', fontSize: '28px', fontWeight: 'bold', marginBottom: '16px' }}>Collective Intelligence Hub</h2>
+                    <p style={{ color: 'white', fontSize: '16px', lineHeight: '1.6', marginBottom: '12px' }}>Revolutionary platform combining crowd wisdom with AI to solve global challenges through distributed decision-making.</p>
+                    <p style={{ color: 'white', fontSize: '14px', lineHeight: '1.5' }}>Coordinating 100,000+ experts worldwide for climate policy, pandemic response, and economic strategy decisions.</p>
+                    <button onClick={() => setIsExpanded(false)} style={{ marginTop: '16px', padding: '8px 16px', backgroundColor: 'rgba(0, 245, 255, 0.1)', border: '1px solid rgba(0, 245, 255, 0.3)', borderRadius: '8px', color: '#00f5ff', fontSize: '12px', cursor: 'pointer' }}>Close</button>
+                </div>
+            )}
+        </div>
+    )
+}
+
 function DecisionArchitectOverlay() {
     const [position, setPosition] = useState({ top: 200, left: 500 })
     const [isVisible, setIsVisible] = useState(false)
@@ -413,9 +857,15 @@ export default function Home() {
             <DecisionArchitectOverlay />
             <EducationOverlay />
             <DataScienceOverlay />
+            <ProjectOverlay />
+            <ProjectYOverlay />
+            <ProjectZOverlay />
+            <ProjectAOverlay />
+            <ProjectBOverlay />
+            <ProjectCOverlay />
 
             {/* Footer with additional navigation - positioned below the decision tree */}
-            <footer className="relative bg-deep-slate/95 border-t border-decision-green/20 py-8 px-4 sm:px-6 lg:px-8">
+            <footer className="bg-slate-900 text-white py-8">
                 <div className="max-w-4xl mx-auto text-center">
                     <h3 className="text-lg font-bold text-decision-green mb-4">
                         Ready to explore decision-making innovation?

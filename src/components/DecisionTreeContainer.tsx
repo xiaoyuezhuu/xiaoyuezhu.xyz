@@ -48,6 +48,36 @@ export default function DecisionTreeContainer({
             window.dispatchEvent(new CustomEvent('dataScienceNodeClicked', {
                 detail: { nodeType: 'data-science', node }
             }))
+        } else if (node.level === 2 && node.id === 3) {
+            // First node on third layer (project)
+            window.dispatchEvent(new CustomEvent('projectNodeClicked', {
+                detail: { nodeType: 'project', node }
+            }))
+        } else if (node.level === 2 && node.id === 4) {
+            // Second node on third layer (project Y)
+            window.dispatchEvent(new CustomEvent('projectYNodeClicked', {
+                detail: { nodeType: 'projectY', node }
+            }))
+        } else if (node.level === 2 && node.id === 5) {
+            // Third node on third layer (project Z)
+            window.dispatchEvent(new CustomEvent('projectZNodeClicked', {
+                detail: { nodeType: 'projectZ', node }
+            }))
+        } else if (node.level === 2 && node.id === 6) {
+            // Fourth node on third layer (project A)
+            window.dispatchEvent(new CustomEvent('projectANodeClicked', {
+                detail: { nodeType: 'projectA', node }
+            }))
+        } else if (node.level === 2 && node.id === 7) {
+            // Fifth node on third layer (project B)
+            window.dispatchEvent(new CustomEvent('projectBNodeClicked', {
+                detail: { nodeType: 'projectB', node }
+            }))
+        } else if (node.level === 2 && node.id === 8) {
+            // Sixth node on third layer (project C)
+            window.dispatchEvent(new CustomEvent('projectCNodeClicked', {
+                detail: { nodeType: 'projectC', node }
+            }))
         } else {
             // For other nodes, show the modal as before
             setTreeState(prev => ({

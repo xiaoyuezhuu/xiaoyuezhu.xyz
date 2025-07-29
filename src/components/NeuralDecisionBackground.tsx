@@ -72,8 +72,8 @@ export default function NeuralDecisionBackground({
                     nodeType = i === 0 ? 'education' : 'datascience'
                     title = i === 0 ? 'PhD in Decision Science' : 'AI Decision Systems'
                 } else {
-                    // Project nodes
-                    const xSpread = Math.min(width * 0.7, 400)
+                    // Project nodes - spread them further apart
+                    const xSpread = Math.min(width, 1000) // Increased from 0.7 and 400 to 0.9 and 800
                     xPos = width / 2 + (i - (nodesInLevel - 1) / 2) * (xSpread / Math.max(1, nodesInLevel - 1))
                     nodeType = 'project'
                     title = `Research Project ${i + 1}`
